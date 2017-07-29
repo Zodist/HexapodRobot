@@ -1,0 +1,32 @@
+//pin setting
+#define miniServo	21
+#define HC_SR		23
+#define DETEC_DISTANCE	300
+
+#define L1_1		0
+#define L1_2		1
+#define L1_3		2
+
+#define L2_1		3
+#define L2_2		4
+#define L2_3		5
+
+#define L3_1		6
+#define L3_2		7
+#define L3_3		8
+
+#define R1_1		9
+#define R1_2		10
+#define R1_3		11
+
+#define R2_1		12
+#define R2_2		13
+#define R2_3		14
+
+#define R3_1		15
+#define R3_2		16	//sensor pin
+#define R3_3		17	//sensor pin
+
+#define miniServoMax	2700
+#define miniServoMin	1700
+#define NumOfSector	10
