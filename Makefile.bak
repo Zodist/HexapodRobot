@@ -54,5 +54,5 @@ $(DIR_OBJECTS)/ultraSonic.o : $(DIR_FUNC)ultraSonic.c
 $(DIR_OBJECTS)/movement.o : $(DIR_FUNC)movement.c
 	gcc -c -o $@ $(DIR_FUNC)movement.c -I $(DIR_HED)
 
-$(DIR_OBJECTS)/server.o : $(DIR_FUNC)server.c
+$(DIR_OBJECTS)/servoer.o : $(DIR_FUNC)server.c
 	gcc -c -o $@ $(DIR_FUNC)server.c -I $(DIR_HED)

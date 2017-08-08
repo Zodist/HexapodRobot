@@ -1,5 +1,5 @@
 //echo_server.c
-#include "Server.h"
+#include "server.h"
  
 void serverInitialize() {
    serv_sock = socket(PF_INET, SOCK_STREAM, 0);
@@ -48,7 +48,7 @@ void sendXY() {
  
 void error_handling(char *message)
 {
-   fputs(message, stderr);
-    fputc('\n', stderr);
-   exit(1);
+//   fputs(message, stderr);
+//    fputc('\n', stderr);
+//   exit(1);
 }

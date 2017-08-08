@@ -174,104 +174,78 @@ void changeDir(){
 		usleep(100000);
 	}
 }
-void LegMove(int hip[], int leg[], int index, int size, int hipd, int legd){
-	int i = index;
-	int hipidx = hip[i];
-	int legidx = leg[i];
-	int pos;
-	if(isReversed[hipidx]){
-		pos = getStatus(hipidx) + hipd;
-	}else{
-		pos = getStatus(hipidx) - hipd;
-	}
-	servoWrite(hipidx, pos);
-	setStatus(hipidx, pos);
-	usleep(200000);
-	if(isReversed[legidx]){
-		pos = getStatus(legidx) - legd;
-	}else{
-		pos = getStatus(legidx) + legd;
-	}
-	servoWrite(legidx, pos);
-	setStatus(legidx, pos);
-	usleep(200000);
-}
-void MoveAxisUp(int IDArray[], int size, int incrPos){
-	int i;
-	for(i = 0; i < size; i++){
-		int index = IDArray[i];
-		int pos;
-		if(isReversed[index]){
-				pos = getStatus(index) - incrPos;
-		}else{
-				pos = getStatus(index) + incrPos;
-		}
-		servoWrite(index, pos);
-		if(index == R1_1){
-			LegMove(hipB, legB, 0, 3, -200, -500); //Pull
-		}else if(index == R3_1){
-			LegMove(hipB, legB, 2, 3, 200, 500);   //Push
-		}
-		setStatus(index, pos);
-	//	printf("servo : %d -> degree : %d\n", index, pos);
-		
-	}
-	usleep(100000);
-	//usleep(800000);
-}
-void MoveAxisDown(int IDArray[], int size, int decrPos){
-	int i;
-	for(i = 0; i < size; i++){
-		int index = IDArray[i];
-		int pos;
-		if(isReversed[index]){
-			pos = getStatus(index) + decrPos;
-		}else{
-			pos = getStatus(index) - decrPos;
-		}
-		servoWrite(index, pos);
-		setStatus(index, pos);
-		if(index == L1_1){
-			LegMove(hipA, legA, 0, 3, -200, -500); //Pull
-		}else if(index == L3_1){
-			LegMove(hipA, legA, 2, 3, 200, 500);   //Push
-		}
-	//	printf("servo : %d -> degree : %d\n", index, pos);
-	}
-	usleep(100000);
-	//usleep(800000);
-}
 int startmove = 0;
 void moveForward(){
-	{// Ready for first step
-		MoveUp(hipB, 3, 500); 		//hips group B move up 100
-		LegMove(hipB, legB, 0, 3, 200, 500); //Push
-		MoveDown(axisB, 3, 300);	// axis group B move forward 60
-		MoveDown(hipB, 3, 500);		//hips group B move down 100
-	}	
-	{// Move 1 step forward
-		MoveUp(hipA, 3, 500);		//hips group A move up 100
-		MoveAxisUp(axisB, 3, 300);		// axis group B move backward 60
-	}
-	{// Ready for second step
-		LegMove(hipA, legA, 0, 3, 200, 500);   //Push
-		MoveUp(axisA, 3, 300);	// axis group A move forward 60
-		MoveDown(hipA, 3, 500);		//hips group A move down 100
-	}
-	{// Move 2 step forward
-		MoveUp(hipB, 3, 500);		//hips group A move up 100
-		MoveAxisDown(axisA, 3, 300);		// axis group B move backward 60
-	}
-	{// End walking
-		LegMove(hipB, legB, 2, 3, -200, -500);   //Pull back
-		MoveDown(hipB, 3, 500);
-		MoveUp(hipA, 3, 500);
-		LegMove(hipA, legA, 2, 3, -200, -500);   //Pull back
-		MoveDown(hipA, 3, 500);
-	}
-	printf("One Cycle\n");
+	///*
+	MoveUp(hipB, 3, 500); 		//hips group B move up 100
+	MoveDown(axisB, 3, 300);	// axis group B move forward 60
+	MoveUp(axisA, 3, 300);		// axis group A move backward 60
+	MoveDown(hipB, 3, 500);		//hips group B move down 100
+
+	MoveUp(hipA, 3, 500);		//hips group A move up 100
+	MoveUp(axisB, 3, 300);		// axis group B move backward 60
+	MoveDown(axisA, 3, 300);	// axis group A move forward 60
+	MoveDown(hipA,3, 500);		//hips group A move down 100
+	
 	usleep(200000);
-	sleep(1);
+	//*/
+	/*
+	if(startmove == 0){
+		MoveUp(hipB, 3, 300); 		//hips group B move up 100
+		MoveDown(axisB, 3, 300);	// axis group B move forward 60
+		MoveUp(axisA, 3, 300);		// axis group A move backward 60
+		MoveDown(hipB, 3, 300);		//hips group B move down 100
+
+		MoveUp(hipA, 3, 300);		//hips group A move up 100
+		servoWrite(R1_1,1600);	//1300
+		usleep(200000);
+		servoWrite(R3_3,1300);	//1000	
+		usleep(200000);
+		MoveUp(axisB, 3, 500);		// axis group B move backward 60
+		servoWrite(R1_1,1000);
+		usleep(200000);
+		servoWrite(R1_3,700);
+		usleep(200000);
+
+		MoveDown(axisA, 3, 500);	// axis group A move forward 60
+		MoveDown(hipA,3, 300);		//hips group A move down 100
+		
+		usleep(200000);
+		usleep(200000);
+		startmove = 1;
+		return;
+	}
+	MoveUp(hipB, 3, 300); 		//hips group B move up 100
+	MoveDown(axisB, 3, 500);	// axis group B move forward 60
+	
+	servoWrite(L1_3,1400);	//1200
+	usleep(200000);
+	servoWrite(L3_3,1600);	//1400
+	usleep(200000);
+	MoveUp(axisA, 1, 500);		// axis group A move backward 60
+	servoWrite(L1_3,1000);
+	usleep(200000);
+	servoWrite(L3_3,1100);
+	usleep(200000);
+
+	MoveDown(hipB, 3, 300);		//hips group B move down 100
+	MoveUp(hipA, 3, 300);		//hips group A move up 100
+	
+	servoWrite(R1_3,1600);	//1300
+	usleep(200000);
+	servoWrite(R3_3,1300);	//1000	
+	usleep(200000);
+	MoveUp(axisB, 3, 500);		// axis group B move backward 60
+	servoWrite(R1_3,1000);
+	usleep(200000);
+	servoWrite(R3_3,700);
+	usleep(200000);
+
+	MoveDown(axisA, 3, 500);	// axis group A move forward 60
+	MoveDown(hipA,3, 300);		//hips group A move down 100
+	
+	usleep(200000);
+	//*/
 }
 
 
@@ -338,7 +312,6 @@ void MoveUp(int IDArray[], int size, int incrPos){
 		
 	}
 	usleep(100000);
-	//usleep(800000);
 }
 void MoveDown(int IDArray[], int size, int decrPos){
 	int i;
@@ -358,5 +331,4 @@ void MoveDown(int IDArray[], int size, int decrPos){
 	//	printf("servo : %d -> degree : %d\n", index, pos);
 	}
 	usleep(100000);
-	//usleep(800000);
 }

@@ -1,3 +1,4 @@
+#ifdef SERVER_HEADER
 //#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -23,3 +24,4 @@ void waitForClientConnect();
 void waitForClientInput();
 void sendXY();
 void error_handling(char *message);
+#endif

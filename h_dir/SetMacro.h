@@ -24,8 +24,8 @@
 #define R2_3		14
 
 #define R3_1		15
-#define R3_2		16	//sensor pin
-#define R3_3		17	//sensor pin
+#define R3_2		17	//sensor pin
+#define R3_3		18	//sensor pin
 
 #define miniServoMax	2700
 #define miniServoMin	1700

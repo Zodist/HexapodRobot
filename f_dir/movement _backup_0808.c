@@ -174,6 +174,30 @@ void changeDir(){
 		usleep(100000);
 	}
 }
+
+void LegPull(int hip[], int leg[], int size, int hipd, int legd){
+	int i;
+	for(i = 0; i < size; i+=2){
+		int hipidx = hip[i];
+		int legidx = leg[i];
+		int pos;
+		if(isReversed[hipidx]){
+			pos = getStatus(hipidx) + hipd;
+		}else{
+			pos = getStatus(hipidx) - hipd;
+		}
+		servoWrite(hipidx, pos);
+		setStatus(hipidx, pos);
+		if(isReversed[legidx]){
+			pos = getStatus(legidx) - legd;
+		}else{
+			pos = getStatus(legidx) + legd;
+		}
+		servoWrite(legidx, pos);
+		setStatus(legidx, pos);
+	}
+	usleep(100000);
+}
 void LegMove(int hip[], int leg[], int index, int size, int hipd, int legd){
 	int i = index;
 	int hipidx = hip[i];
@@ -243,6 +267,42 @@ void MoveAxisDown(int IDArray[], int size, int decrPos){
 }
 int startmove = 0;
 void moveForward(){
+	/*
+	MoveUp(hipB, 3, 600); 		//hips group B move up 100
+	MoveDown(axisB, 3, 300);	// axis group B move forward 60
+	MoveUp(axisA, 3, 300);		// axis group A move backward 60
+	MoveDown(hipB, 3, 600);		//hips group B move down 100
+
+	MoveUp(hipA, 3, 600);		//hips group A move up 100
+	MoveUp(axisB, 3, 300);		// axis group B move backward 60
+	MoveDown(axisA, 3, 300);	// axis group A move forward 60
+	MoveDown(hipA,3, 600);		//hips group A move down 100
+	
+	usleep(200000);
+	*/
+	///*
+	/*
+	if(startmove == 0)
+	{
+		//Ready for first step
+		MoveUp(hipB, 3, 500); 		//hips group B move up 100
+		LegMove(hipB, legB, 0, 3, 200, 500); //Push
+		MoveDown(axisB, 3, 300);	// axis group B move forward 60
+		MoveDown(hipB, 3, 500);		//hips group B move down 100
+		startmove = 1;
+	}else{
+		LegMove(hipA, legA, 2, 3, -200, -500);   //Push
+		MoveUp(axisB, 3, 300);		// axis group A move forward 60
+		MoveDown(hipB, 3, 500);		//hips group A move down 100
+		
+		MoveUp(hipB, 3, 500); 		//hips group B move up 100
+		LegMove(hipB, legB, 0, 3, 200, 500); //Push
+		MoveDown(axisB, 3, 300);	// axis group B move forward 60
+		MoveDown(hipB, 3, 500);		//hips group B move down 100
+		
+		startmove = 1;
+	}
+	*/
 	{// Ready for first step
 		MoveUp(hipB, 3, 500); 		//hips group B move up 100
 		LegMove(hipB, legB, 0, 3, 200, 500); //Push
@@ -252,6 +312,8 @@ void moveForward(){
 	{// Move 1 step forward
 		MoveUp(hipA, 3, 500);		//hips group A move up 100
 		MoveAxisUp(axisB, 3, 300);		// axis group B move backward 60
+		//LegMove(hipB, legB, 0, 3, -200, -500); //Pull
+		//LegMove(hipB, legB, 2, 3, 200, 500);   //Push
 	}
 	{// Ready for second step
 		LegMove(hipA, legA, 0, 3, 200, 500);   //Push
@@ -260,7 +322,10 @@ void moveForward(){
 	}
 	{// Move 2 step forward
 		MoveUp(hipB, 3, 500);		//hips group A move up 100
+		//LegMove(hipB, legB, 2, 3, -200, -500);   //Pull back
 		MoveAxisDown(axisA, 3, 300);		// axis group B move backward 60
+		//LegMove(hipA, legA, 0, 3, -200, -500); //Pull
+		//LegMove(hipA, legA, 2, 3, 200, 500);   //Push
 	}
 	{// End walking
 		LegMove(hipB, legB, 2, 3, -200, -500);   //Pull back

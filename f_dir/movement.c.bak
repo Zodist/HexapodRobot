@@ -252,6 +252,8 @@ void moveForward(){
 	{// Move 1 step forward
 		MoveUp(hipA, 3, 500);		//hips group A move up 100
 		MoveAxisUp(axisB, 3, 300);		// axis group B move backward 60
+		//LegMove(hipB, legB, 0, 3, -200, -500); //Pull
+		//LegMove(hipB, legB, 2, 3, 200, 500);   //Push
 	}
 	{// Ready for second step
 		LegMove(hipA, legA, 0, 3, 200, 500);   //Push
@@ -260,7 +262,10 @@ void moveForward(){
 	}
 	{// Move 2 step forward
 		MoveUp(hipB, 3, 500);		//hips group A move up 100
+		//LegMove(hipB, legB, 2, 3, -200, -500);   //Pull back
 		MoveAxisDown(axisA, 3, 300);		// axis group B move backward 60
+		//LegMove(hipA, legA, 0, 3, -200, -500); //Pull
+		//LegMove(hipA, legA, 2, 3, 200, 500);   //Push
 	}
 	{// End walking
 		LegMove(hipB, legB, 2, 3, -200, -500);   //Pull back

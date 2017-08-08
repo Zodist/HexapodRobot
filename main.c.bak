@@ -56,7 +56,7 @@ void main(int argc, char **argv) {
 			storeVector();
 			detecResult = detectObj();
 			if(detecResult) {
-				printf("**Object detected!\n");
+				printf("**Object detected!    : ");
 				changeDir();
 				changeDir();
 				changeDir();
@@ -64,7 +64,8 @@ void main(int argc, char **argv) {
 				showVector();
 				//break;
 			}
-			else	printf("**Object not detected\n");
+			else	
+				printf("**Object not detected : ");
 			//usleep(500000); // delay 0.5s
 		}
 	}
