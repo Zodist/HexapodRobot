@@ -31,16 +31,11 @@ GYROOBJECTS = $(OBJECTS_DIR)/RTIMULibDrive.o \
  $(OBJECTS_DIR)/RTIMULSM9DS1.o \
  $(OBJECTS_DIR)/RTIMUBMX055.o \
  $(OBJECTS_DIR)/RTIMUBNO055.o \
- $(OBJECTS_DIR)/RTPressure.o \
- $(OBJECTS_DIR)/RTPressureBMP180.o \
- $(OBJECTS_DIR)/RTPressureLPS25H.o \
- $(OBJECTS_DIR)/RTPressureMS5611.o \
- $(OBJECTS_DIR)/RTPressureMS5637.o 
 
 .SUFFIXES : .c .o
 
 $(TARGET) : $(OBJS)
-	$(CC) -o $@ $(OBJS) $(GYROOBJECTS) RoboPiLib.o -lstdc++
+	$(CC) -o $@ $(OBJS) $(GYROOBJECTS) $(DIR_OBJECTS)/RoboPiLib.o -lstdc++
 
 clean:
 	rm -f $(OBJS) $(GYROOBJECTS)

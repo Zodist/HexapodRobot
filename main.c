@@ -1,13 +1,12 @@
 #include <stdio.h>
 #include "RoboPiLib.h"
 #include "SetMacro.h"
-#include "server.h"
+#include "Server.h"
 
 //detect object by UltraSonic Sensor
 extern int detectObj();
 
 //movement func
-extern int MoveRobot();
 extern void initializePosi();
 extern void stablePosi();
 extern void moveForward();
@@ -16,6 +15,7 @@ extern void MoveDown(int[], int, int);
 extern void CMoveUp(int[], int, int);
 extern void CMoveDown(int[], int, int);
 extern void changeDir();
+extern int hips;
 
 //initializePi func is setting 'pinMode', 'RoboPiInit'
 void initializePi();
@@ -48,9 +48,10 @@ void main(int argc, char **argv) {
 	printf("moveForward? 1:yes, 0:no ");
 	scanf("%d",&an);
 	if(an) {
-		printf("input a,b : ");
-		scanf("%d %d", &tmp1, &tmp2);
+		printf("input a,b,c : ");
+		scanf("%d %d %d", &tmp1, &tmp2, &hips);
 		downHips(tmp1,tmp2);
+		stablePosi();
 		while(1) {
 			moveForward();
 			storeVector();
@@ -58,18 +59,13 @@ void main(int argc, char **argv) {
 			if(detecResult) {
 				printf("**Object detected!\n");
 				changeDir();
-				changeDir();
-				changeDir();
 				storeVector();				
 				showVector();
-				//break;
-			}
-			else	printf("**Object not detected\n");
-			//usleep(500000); // delay 0.5s
+			}else	
+				printf("**Object not detected\n");
 		}
 	}
 	stablePosi();
-	testServo();
 	RoboPiExit();
 	
 	//========= TODO : Alogithm ===========//
@@ -78,23 +74,22 @@ void main(int argc, char **argv) {
 void initialize() {
 	/*raspberryPi initialization*/
 	initializePi();
-	printf("raspberryPi initialization ======== DONE\n");
-
-	/*robot position initialization*/
-	initializePosi();
-	printf("robot position initialization ===== DONE\n");
+	printf("DONE ======== raspberryPi initialization\n");
 
 	/*gyro sensor initialization*/
-	printf("===========================================\n");
 	gyroInit();
-	printf("gyro sensor initialization ======== DONE\n");
-	printf("===========================================\n");
+	printf("DONE ======== gyro sensor initialization\n");
+	printf("========================================\n");
 
 	/*server initialization*/
 	serverInitialize();
-	printf("server initialization ============= DONE\n\n");
+	printf("DONE ============= server initialization\n");
 
 	printf("**initialization all ============== DONE**\n");
+
+	/*robot position initialization*/
+	initializePosi();
+	printf("DONE ===== robot position initialization \n");
 }
 void initializePi() {
 	RoboPiInit("/dev/serial0", 115200);
