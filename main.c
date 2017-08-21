@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "RoboPiLib.h"
 #include "SetMacro.h"
-#include "Server.h"
+//#include "Server.h"
 
 //detect object by UltraSonic Sensor
 extern int detectObj();
@@ -14,7 +14,7 @@ extern void MoveUp(int[],int,int);
 extern void MoveDown(int[], int, int);
 extern void CMoveUp(int[], int, int);
 extern void CMoveDown(int[], int, int);
-extern void changeDir();
+extern void changeDir(int dir);
 extern int hips;
 
 //initializePi func is setting 'pinMode', 'RoboPiInit'
@@ -31,6 +31,7 @@ extern void storeVector();
 extern void showVector();
 
 //server
+extern int clnt_sock;
 extern void serverInitialize();
 
 void main(int argc, char **argv) {
@@ -38,33 +39,51 @@ void main(int argc, char **argv) {
 	int an;
 	int detecResult=0;
 	
-	int tmp1, tmp2;
-	
 	/*initialize*/
 	initialize();
+	/*initialize*/		
 	
 	//========= TODO : Alogithm ===========//
 	
+	printf("Server 1:On, 0:Off ");
+	scanf("%d",&an);
+	if(an)
+	{
+		waitForClientConnect();
+		waitForClientInput();
+	}
+    //close(clnt_sock);       /* 연결 종료 */
+	
+
+	/*robot position initialization*/
+	initializePosi();
+	printf("DONE ===== robot position initialization \n");
+
 	printf("moveForward? 1:yes, 0:no ");
 	scanf("%d",&an);
 	if(an) {
-		printf("input a,b,c : ");
-		scanf("%d %d %d", &tmp1, &tmp2, &hips);
-		downHips(tmp1,tmp2);
-		stablePosi();
 		while(1) {
 			moveForward();
 			storeVector();
 			detecResult = detectObj();
 			if(detecResult) {
 				printf("**Object detected!\n");
-				changeDir();
-				storeVector();				
+				tmpStore();
+				printf("ChangeDir? 1:right, 0:left ");
+				scanf("%d",&an);
+				for(i=0;i<5;i++){					
+					changeDir(an);
+					storeVector();
+					sleep(1);
+				}
+				tmpStore();				
 				showVector();
 			}else	
 				printf("**Object not detected\n");
 		}
 	}
+	close(clnt_sock);
+	testServo();
 	stablePosi();
 	RoboPiExit();
 	
@@ -85,11 +104,7 @@ void initialize() {
 	serverInitialize();
 	printf("DONE ============= server initialization\n");
 
-	printf("**initialization all ============== DONE**\n");
-
-	/*robot position initialization*/
-	initializePosi();
-	printf("DONE ===== robot position initialization \n");
+	printf("**initialization all ============== DONE**\n\n");
 }
 void initializePi() {
 	RoboPiInit("/dev/serial0", 115200);

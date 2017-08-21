@@ -11,19 +11,19 @@ int legA[3] = {L1_3, R2_3, L3_3};
 int legB[3] = {R1_3, L2_3, R3_3};
 
 int position2[19] = {
-	1500, 1300, 1300,
+	1500, 1200, 1200,
 	1000, 1350, 1400,
 	700, 1200, 1500,
 	1200, 1150, 1100,
-	1800, 800, 800,
+	1800, 1000, 1000,
 	2200, 0 ,1100, 700
 	};
 int position[19] = {
-	1500, 1300, 1300,
+	1500, 1200, 1200,
 	1000, 1350, 1400,
 	700, 1200, 1500,
 	1200, 1150, 1100,
-	1800, 800, 800,
+	1800, 1000, 1000,
 	2200, 0 ,1100, 700
 	};
 
@@ -35,7 +35,7 @@ int isReversed[] = {
 	0, 0, 1,
 	0, 0, 0, 1
 	};
-int axis = 300;
+int axis = 400;
 int hips = 500; // default 500
 const int t1 = 100;
 const int t2 = 200;
@@ -140,9 +140,10 @@ void CMoveDown(int IDArray[], int size, int decrPos){
 	usleep(100000);
 }
 
-void changeDir(){
+void changeDir(int dir){
 	int i;
-	for(i=0;i<3;i++){
+	// dir == 1 : Turn Right
+	if(dir){
 		MoveUp(hipB, 3, hips); 		//hips group B move up 100
 		CMoveUp(axisA, 3, 300);	// axis group B move forward 60
 		MoveDown(hipB, 3, hips);		//hips group B move down 100
@@ -152,6 +153,18 @@ void changeDir(){
 		CMoveUp(axisB, 3, 300);		// axis group A move backward 60
 		MoveDown(hipA, 3, hips);		//hips group A move up 100
 		CMoveDown(axisB, 3, 300);		// axis group A move backward 60
+		usleep(100000);
+	}else{
+	// dir == 1 : Turn Left
+		MoveUp(hipB, 3, hips); 		//hips group B move up 100
+		CMoveDown(axisA, 3, 300);	// axis group B move forward 60
+		MoveDown(hipB, 3, hips);		//hips group B move down 100
+		CMoveUp(axisA, 3, 300);	// axis group B move forward 60		
+		usleep(100000);
+		MoveUp(hipA, 3, hips);		//hips group A move up 100
+		CMoveDown(axisB, 3, 300);		// axis group A move backward 60
+		MoveDown(hipA, 3, hips);		//hips group A move up 100
+		CMoveUp(axisB, 3, 300);		// axis group A move backward 60
 		usleep(100000);
 	}
 }
@@ -200,6 +213,7 @@ void MoveAxisUp(int IDArray[], int size, int incrPos){
 			LegMove(hipA, legA, 0, 3, -t1, -t2); //Pull
 		}else if(index == L3_1){
 			LegMove(hipA, legA, 2, 3, -t3, -t4);   //Push
+			//LegMove(hipA, legA, 2, 3, 0, 0);   //Push
 		}
 		servoWrite(index, pos);
 		setStatus(index, pos);
@@ -208,15 +222,19 @@ void MoveAxisUp(int IDArray[], int size, int incrPos){
 void MoveUpHipsForReady(int hip[], int leg[], int size){
 	LegMove(hip, leg, 0, size, -hips+t1, t2);	//Push
 	LegMove(hip, leg, 1, size, -hips, 0);	//Push
-	LegMove(hip, leg, 2, size, -hips+t3, t4);	//Push
+	if(hip[2]==L3_2){
+		LegMove(hip, leg, 2, size, -hips+t3, t4);	//Push
+	}else
+		LegMove(hip, leg, 2, size, -hips+t3, t4);	//Push
 }
 
 void moveForward(){
 	{// Ready for first step
-		if(startmove == 0){
+		if(startmove == 10){
 			MoveUpHipsForReady(hipB, legB, 3);
 			startmove = 1;
 		}
+		MoveUpHipsForReady(hipB, legB, 3);
 		MoveDown(axisB, 3, axis);				//axis group B move forward 60
 		MoveDown(hipB, 3, hips);				//hips group B move down 100
 	}
@@ -228,12 +246,13 @@ void moveForward(){
 	}
 	{
 		MoveDown(hipA, 3, hips);				//hips group A move down 100
-		//MoveUp(hipB, 3, hips);					//hips group A move up 100
-		MoveUpHipsForReady(hipB, legB, 3);
+		MoveUp(hipB, 3, hips);					//hips group A move up 100
+		//MoveUpHipsForReady(hipB, legB, 3);
 		// Move 2 step forward
 		MoveAxisUp(axisA, 3, axis);				//axis group B move backward 60
 	}
 	{// End walking
+		MoveDown(hipB, 3, hips);
 		//if(startmove == 0){
 		//	MoveDown(hipB, 3, hips);
 		//}
@@ -252,6 +271,7 @@ void initializePosi(){
 			servoWrite(i, position[i]);
 			usleep(100000);
 		}
+		downHips(200,-200);
 		stablePosi();
 	}
 	printf("initialize Position ===== SUCCESS\n");

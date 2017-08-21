@@ -26,15 +26,66 @@ extern "C"{
 	void showVector(){
 		int i;
 		for(i=0;i<vecX.size();i++){
-			printf("%d => %f %f %f\n",i,vecX[i],vecY[i],vecZ[i]);
+			//printf("%d => %f %f %f\n",i,vecX[i],vecY[i],vecZ[i]);
+			printf("%d => %f\n",i,vecZ[i]);
 		}
 	}
-
+	/*
+	int startFlag = 1;
+	void storeVector() {
+		if (startFlag) {
+			getDegree(degree);
+			vecX.push_back(degree[0]);
+			vecY.push_back(degree[1]);
+			vecZ.push_back(degree[2]);
+			startFlag = 0;
+		}
+		else {
+			getDegree(degree);
+			//vecX.push_back(vecX.begin() - degree[0]);
+			//vecY.push_back(vecY.begin() - degree[1]);
+			//vecZ.push_back(vecZ.begin() - degree[2]);
+			vecX.push_back(vecX[0] - degree[0]);
+			vecY.push_back(vecY[0] - degree[1]);
+			vecZ.push_back(vecZ[0] - degree[2]);
+		}
+	}
+	*/
 	void storeVector(){
 		getDegree(degree);
-		vecX.push_back(degree[0]);
-		vecY.push_back(degree[1]);
+		//vecX.push_back(degree[0]);
+		//vecY.push_back(degree[1]);
 		vecZ.push_back(degree[2]);
+	}
+	void tmpStore(){
+		//vecX.push_back(0);
+		//vecY.push_back(0);
+		vecZ.push_back(0);
+	}
+	
+	//앞으로 직진 -> 한싸이클 하고 벡터저장
+	//changedir 방향 변경 -> 함수한번 부를때마다 벡터저장한다고 치면
+	//장애물감지 안돼서 직진하기 전에 analyVector?
+	int analyVector() {
+		//벡터내의 모든 값들을 이전값과 비교해서 뺀값을 구해서 방향결정?
+		//다시 원위치와서 차이값이 0일때 벡터비우기
+		//리턴값 0:직진, 1:왼쪽회전, 2:오른쪽회전
+		int i;
+		int diff=0;
+		for (i = vecZ.size() - 1; i > 0; i--) {
+			diff += vecZ[i] - vecZ[i - 1];
+		}
+
+		if (diff < 0) {
+			return 1;
+		}else if (diff > 0) {
+			return 2;
+		}else if (diff == 0) {
+		//벡터비우기 : 초기값 제외
+		for (i = vecZ.size() - 1; i > 0 i--)
+			vecZ.pop_back();
+			return 0;
+		}
 	}
 
 	void gyroInit(){
