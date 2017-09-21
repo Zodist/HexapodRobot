@@ -1,91 +1,117 @@
 #include "RTIMULib.h"
 #include "RTMath.h"
+#include <math.h>
 #include <iostream>
 #include <vector>
 using namespace std;
 
 //void RTUMULibDrive()
 extern "C"{
+	extern int moveDirection;
 	int sampleCount = 0;
 	int sampleRate = 0;
+
 	uint64_t rateTimer;
 	uint64_t displayTimer;
 	uint64_t now;
 	RTIMUSettings *settings;
 	RTIMU *imu;
-	
+
+	int stdX = 0;
+	int stdY = 0;
+	int stdZ = 0;	
 	float degree[3];
 	vector<float> vecX;
 	vector<float> vecY;
 	vector<float> vecZ;
+	vector<int> vecZint;
 
 	void gyroInit();
 	void getDegree(float degree[]);
 	RTFLOAT gyroSensor();
 	
 	void showVector(){
-		int i;
-		for(i=0;i<vecX.size();i++){
+		//int i;
+		//for(i=0;i<vecZint.size();i++){
 			//printf("%d => %f %f %f\n",i,vecX[i],vecY[i],vecZ[i]);
-			printf("%d => %f\n",i,vecZ[i]);
-		}
+			//printf("%d => %f\n",i,vecZ[i]);
+			//printf("%d => %d\n",i,vecZint[i]);
+		//}
 	}
-	/*
-	int startFlag = 1;
-	void storeVector() {
-		if (startFlag) {
-			getDegree(degree);
-			vecX.push_back(degree[0]);
-			vecY.push_back(degree[1]);
-			vecZ.push_back(degree[2]);
-			startFlag = 0;
-		}
-		else {
-			getDegree(degree);
-			//vecX.push_back(vecX.begin() - degree[0]);
-			//vecY.push_back(vecY.begin() - degree[1]);
-			//vecZ.push_back(vecZ.begin() - degree[2]);
-			vecX.push_back(vecX[0] - degree[0]);
-			vecY.push_back(vecY[0] - degree[1]);
-			vecZ.push_back(vecZ[0] - degree[2]);
-		}
-	}
-	*/
-	void storeVector(){
+	void setStd(){
 		getDegree(degree);
+		//stdX = degree[0];
+		//stdY = degree[1];
+		stdZ = degree[2];
+		//vecZ.push_back(degree[2]);
+		vecZint.push_back((int)degree[2]);
+	}
+
+	int cnt = 0;
+	void storeVector(){
+		int curr;
 		//vecX.push_back(degree[0]);
 		//vecY.push_back(degree[1]);
-		vecZ.push_back(degree[2]);
-	}
+		//printf("Z -> %d\n",(int)degree[2]);
+		getDegree(degree);
+		curr = (int)degree[2];
+		
+		if(abs(curr - vecZint.back()) <= 40) {
+			vecZint.push_back(curr);
+			cnt++;
+			if(cnt == 50) {
+				//printf("GyroZ => %d\n",curr);
+				cnt = 0;
+			}
+		}
+		//printf("GyroZ => %f\n",degree[2]);
+   }
 	void tmpStore(){
 		//vecX.push_back(0);
 		//vecY.push_back(0);
-		vecZ.push_back(0);
+		//vecZ.push_back(0);
 	}
 	
 	//앞으로 직진 -> 한싸이클 하고 벡터저장
 	//changedir 방향 변경 -> 함수한번 부를때마다 벡터저장한다고 치면
 	//장애물감지 안돼서 직진하기 전에 analyVector?
-	int analyVector() {
+	const int rangeMax = 28;
+	const int rangeMin = -28;
+	int cnt2 = 0;
+	int leftcnt = 0;
+	int rightcnt = 0;
+	void analyVector() {
 		//벡터내의 모든 값들을 이전값과 비교해서 뺀값을 구해서 방향결정?
 		//다시 원위치와서 차이값이 0일때 벡터비우기
 		//리턴값 0:직진, 1:왼쪽회전, 2:오른쪽회전
 		int i;
 		int diff=0;
-		for (i = vecZ.size() - 1; i > 0; i--) {
-			diff += vecZ[i] - vecZ[i - 1];
+		for (i = vecZint.size() - 1; i > 0; i--) {
+			diff += vecZint[i] - vecZint[i - 1];
 		}
-
-		if (diff < 0) {
-			return 1;
-		}else if (diff > 0) {
-			return 2;
-		}else if (diff == 0) {
-		//벡터비우기 : 초기값 제외
-		for (i = vecZ.size() - 1; i > 0 i--)
-			vecZ.pop_back();
-			return 0;
+		cnt2++;
+		if(cnt2 == 50) {
+			printf("Diff => %d\n",diff);
+			cnt2 = 0;
+		}	
+		if (diff >= rangeMax+9) {
+			moveDirection = 1;
+			leftcnt++;
+			if(leftcnt%50==0)
+				printf("Want to go left : %d\n",diff);
+		}else if (diff <= rangeMin-9) {
+			moveDirection = 2;
+			rightcnt++;
+			if(rightcnt%50==0)
+				printf("Want to go Right : %d\n",diff);
+		}else if (diff < rangeMax && diff > rangeMin) {
+			//printf("Want to go Forward : %d\n",diff);
+			//벡터비우기 : 초기값 제외
+			vecZint.clear();
+			vecZint.push_back(stdZ);
+			moveDirection = 0;
 		}
+		return;
 	}
 
 	void gyroInit(){
@@ -122,7 +148,7 @@ extern "C"{
 				degree[0] = imuData.fusionPose.x() * RTMATH_RAD_TO_DEGREE;
 				degree[1] = imuData.fusionPose.y() * RTMATH_RAD_TO_DEGREE;
 				degree[2] = imuData.fusionPose.z() * RTMATH_RAD_TO_DEGREE;
-				printf("\n");
+				//printf("\n");
 				//printf("***degree test*** x = %f, y = %f, z = %f\n",degreeX,degreeY,degreeZ);
 				return ;
 			}

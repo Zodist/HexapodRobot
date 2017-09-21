@@ -22,28 +22,49 @@
 //  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#ifndef _RTIMULIB_H
-#define	_RTIMULIB_H
+#include "RTPressure.h"
 
-#include "RTIMULibDefs.h"
+#include "RTPressureBMP180.h"
+#include "RTPressureLPS25H.h"
+#include "RTPressureMS5611.h"
+#include "RTPressureMS5637.h"
 
-#include "RTMath.h"
+RTPressure *RTPressure::createPressure(RTIMUSettings *settings)
+{
+    switch (settings->m_pressureType) {
+    case RTPRESSURE_TYPE_BMP180:
+        return new RTPressureBMP180(settings);
 
-#include "RTFusion.h"
-#include "RTFusionKalman4.h"
+    case RTPRESSURE_TYPE_LPS25H:
+        return new RTPressureLPS25H(settings);
 
-#include "RTIMUHal.h"
-#include "IMUDrivers/RTIMU.h"
-#include "IMUDrivers/RTIMUNull.h"
-#include "IMUDrivers/RTIMUMPU9150.h"
-#include "IMUDrivers/RTIMUGD20HM303D.h"
-#include "IMUDrivers/RTIMUGD20M303DLHC.h"
-#include "IMUDrivers/RTIMULSM9DS0.h"
+    case RTPRESSURE_TYPE_MS5611:
+        return new RTPressureMS5611(settings);
 
-#include "IMUDrivers/RTHumidity.h"
-#include "IMUDrivers/RTHumidityHTS221.h"
+    case RTPRESSURE_TYPE_MS5637:
+        return new RTPressureMS5637(settings);
 
-#include "RTIMUSettings.h"
+    case RTPRESSURE_TYPE_AUTODISCOVER:
+        if (settings->discoverPressure(settings->m_pressureType, settings->m_I2CPressureAddress)) {
+            settings->saveSettings();
+            return RTPressure::createPressure(settings);
+        }
+        return NULL;
+
+    case RTPRESSURE_TYPE_NULL:
+        return NULL;
+
+    default:
+        return NULL;
+    }
+}
 
 
-#endif // _RTIMULIB_H
+RTPressure::RTPressure(RTIMUSettings *settings)
+{
+    m_settings = settings;
+}
+
+RTPressure::~RTPressure()
+{
+}

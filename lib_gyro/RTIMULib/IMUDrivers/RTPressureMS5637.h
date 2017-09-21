@@ -21,29 +21,49 @@
 //  OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 //  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+#ifndef _RTPRESSUREMS5637_H_
+#define _RTPRESSUREMS5637_H_
 
-#ifndef _RTIMULIB_H
-#define	_RTIMULIB_H
+#include "RTPressure.h"
 
-#include "RTIMULibDefs.h"
+//  State definitions
 
-#include "RTMath.h"
+#define MS5637_STATE_IDLE               0
+#define MS5637_STATE_TEMPERATURE        1
+#define MS5637_STATE_PRESSURE           2
 
-#include "RTFusion.h"
-#include "RTFusionKalman4.h"
+class RTIMUSettings;
 
-#include "RTIMUHal.h"
-#include "IMUDrivers/RTIMU.h"
-#include "IMUDrivers/RTIMUNull.h"
-#include "IMUDrivers/RTIMUMPU9150.h"
-#include "IMUDrivers/RTIMUGD20HM303D.h"
-#include "IMUDrivers/RTIMUGD20M303DLHC.h"
-#include "IMUDrivers/RTIMULSM9DS0.h"
+class RTPressureMS5637 : public RTPressure
+{
+public:
+    RTPressureMS5637(RTIMUSettings *settings);
+    ~RTPressureMS5637();
 
-#include "IMUDrivers/RTHumidity.h"
-#include "IMUDrivers/RTHumidityHTS221.h"
+    virtual const char *pressureName() { return "MS5637"; }
+    virtual int pressureType() { return RTPRESSURE_TYPE_MS5611; }
+    virtual bool pressureInit();
+    virtual bool pressureRead(RTIMU_DATA& data);
 
-#include "RTIMUSettings.h"
+private:
+    void pressureBackground();
+    void setTestData();
 
+    unsigned char m_pressureAddr;                           // I2C address
+    RTFLOAT m_pressure;                                     // the current pressure
+    RTFLOAT m_temperature;                                  // the current temperature
 
-#endif // _RTIMULIB_H
+    int m_state;
+
+    uint16_t m_calData[6];                                  // calibration data
+
+    uint32_t m_D1;
+    uint32_t m_D2;
+
+    uint64_t m_timer;                                       // used to time coversions
+
+    bool m_validReadings;
+};
+
+#endif // _RTPRESSUREMS5637_H_
+

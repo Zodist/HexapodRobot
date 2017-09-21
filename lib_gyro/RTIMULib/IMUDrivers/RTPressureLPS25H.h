@@ -21,29 +21,33 @@
 //  OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 //  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+#ifndef _RTPRESSURELPS25H_H_
+#define _RTPRESSURELPS25H_H_
 
-#ifndef _RTIMULIB_H
-#define	_RTIMULIB_H
+#include "RTPressure.h"
 
-#include "RTIMULibDefs.h"
+class RTIMUSettings;
 
-#include "RTMath.h"
+class RTPressureLPS25H : public RTPressure
+{
+public:
+    RTPressureLPS25H(RTIMUSettings *settings);
+    ~RTPressureLPS25H();
 
-#include "RTFusion.h"
-#include "RTFusionKalman4.h"
+    virtual const char *pressureName() { return "LPS25H"; }
+    virtual int pressureType() { return RTPRESSURE_TYPE_LPS25H; }
+    virtual bool pressureInit();
+    virtual bool pressureRead(RTIMU_DATA& data);
 
-#include "RTIMUHal.h"
-#include "IMUDrivers/RTIMU.h"
-#include "IMUDrivers/RTIMUNull.h"
-#include "IMUDrivers/RTIMUMPU9150.h"
-#include "IMUDrivers/RTIMUGD20HM303D.h"
-#include "IMUDrivers/RTIMUGD20M303DLHC.h"
-#include "IMUDrivers/RTIMULSM9DS0.h"
+private:
+    unsigned char m_pressureAddr;                           // I2C address
 
-#include "IMUDrivers/RTHumidity.h"
-#include "IMUDrivers/RTHumidityHTS221.h"
+    RTFLOAT m_pressure;                                     // the current pressure
+    RTFLOAT m_temperature;                                  // the current temperature
+    bool m_pressureValid;
+    bool m_temperatureValid;
 
-#include "RTIMUSettings.h"
+};
 
+#endif // _RTPRESSURELPS25H_H_
 
-#endif // _RTIMULIB_H

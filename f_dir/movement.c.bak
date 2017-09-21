@@ -4,8 +4,8 @@
 
 //setting GROUP
 //const int axisA[3] = {L1_1, R2_1, L3_1};
-//const int axisB[3] = {R1_1, L2_1, R3_1};
 const int axisA[3] = {L3_1, R2_1, L1_1};
+//const int axisB[3] = {R1_1, L2_1, R3_1};
 const int axisB[3] = {R3_1, L2_1, R1_1};
 const int hipA[3] = {L1_2, R2_2, L3_2};
 const int hipB[3] = {R1_2, L2_2, R3_2};
@@ -33,7 +33,7 @@ int position2[19] = {
 	1500, 1200, 1300,
 	1000, 1400, 1400,
 	700, 1200, 1500,
-	1200, 950, 1100,
+	1200, 1350, 1100,
 	//1200, 1150, 1100,
 	1800, 900, 850,
 	2200, 0 ,1100, 800
@@ -42,7 +42,7 @@ int position[19] = {
 	1500, 1200, 1300,
 	1000, 1400, 1400,
 	700, 1200, 1500,
-	1200, 950, 1100,
+	1200, 1350, 1100,
 	//1200, 1150, 1100,
 	1800, 900, 850,
 	2200, 0 ,1100, 800
@@ -59,18 +59,16 @@ const int isReversed[] = {
 const int axis = 300;
 const int hips = 500; // default 500
 //legmove 
-/*Good move
 const int t1 = 80;
 const int t2 = 200;
-const int t3 = -80;
-const int t4 = -200;
-*/
-const int t1 = 40;//40
-const int t2 = 200;
-const int t3 = 70;//-40
+const int t3 = 100;//100
 const int t4 = -200;//-200
+//const int t1 = 100;
+//const int t2 = 150;
+//const int t3 = 200;
+//const int t4 = -200;
 
-const int servoterm = 190000;
+const int servoterm = 250000;
 
 int startmove = 0;
 
@@ -141,7 +139,7 @@ void CMoveUp(int IDArray[], int size, int incrPos){
 		int pos;
 		if(1){
 			if(index==7){
-				pos = getStatus(index) - incrPos;// -100;
+				pos = getStatus(index) - incrPos -100;
 			}else
 				pos = getStatus(index) - incrPos;
 		}else{
@@ -159,7 +157,7 @@ void CMoveDown(int IDArray[], int size, int decrPos){
 		int pos;
 		if(1){
 			if(index==7){
-				pos = getStatus(index) + decrPos;// +100;
+				pos = getStatus(index) + decrPos +100;
 			}else
 				pos = getStatus(index) + decrPos;
 		}else{
@@ -172,19 +170,17 @@ void CMoveDown(int IDArray[], int size, int decrPos){
 }
 
 void changeDir(int dir){
-	const int trunTime = 200000;
-	const int turnAxis = 250;
+	const int trunTime = 100000;
+	const int turnAxis = 300;
 	// dir == 1 : Turn Right
 	if(dir){
 		MoveUp(hipB, 3, hips); 		//hips group B move up 100
 		CMoveUp(axisA, 3, turnAxis);	// axis group B move forward 60
-		usleep(trunTime);
 		MoveDown(hipB, 3, hips);		//hips group B move down 100
 		CMoveDown(axisA, 3, turnAxis);	// axis group B move forward 60
 		usleep(trunTime);
 		MoveUp(hipA, 3, hips);		//hips group A move up 100
 		CMoveUp(axisB, 3, turnAxis);		// axis group A move backward 60
-		usleep(trunTime);
 		MoveDown(hipA, 3, hips);		//hips group A move up 100
 		CMoveDown(axisB, 3, turnAxis);		// axis group A move backward 60
 		usleep(trunTime);
@@ -192,13 +188,11 @@ void changeDir(int dir){
 	// dir == 0 : Turn Left
 		MoveUp(hipB, 3, hips); 		//hips group B move up 100
 		CMoveDown(axisA, 3, turnAxis);	// axis group B move forward 60
-		usleep(trunTime);
 		MoveDown(hipB, 3, hips);		//hips group B move down 100
 		CMoveUp(axisA, 3, turnAxis);	// axis group B move forward 60		
 		usleep(trunTime);
 		MoveUp(hipA, 3, hips);		//hips group A move up 100
 		CMoveDown(axisB, 3, turnAxis);		// axis group A move backward 60
-		usleep(trunTime);
 		MoveDown(hipA, 3, hips);		//hips group A move up 100
 		CMoveUp(axisB, 3, turnAxis);		// axis group A move backward 60
 		usleep(trunTime);
@@ -268,31 +262,37 @@ void MoveUpHipsForReady(int hip[], int leg[], int size){
 
 void moveForward(){
 	{// Ready for first step
+		//if(startmove == 10){
+		//	MoveUpHipsForReady(hipB, legB, 3);
+		//	startmove = 1;
+		//}
 		MoveUpHipsForReady(hipB, legB, 3);
 		MoveDown(axisB, 3, axis);				//axis group B move forward 60
 		MoveDown(hipB, 3, hips);				//hips group B move down 100
 	}
-	{
-		MoveUpHipsForReady(hipA, legA, 3);		// Ready for second step
+	{// Ready for second step
+		MoveUpHipsForReady(hipA, legA, 3);
 		// Move 1 step forward 
 		MoveAxisUp(axisB, 3, axis);				//axis group B move backward 60
-		//usleep(80000);
 		MoveDown(axisA, 3, axis);				//axis group A move forward 60
 	}
 	{
 		MoveDown(hipA, 3, hips);				//hips group A move down 100
-		usleep(100000);
+		//usleep(200000);
 		MoveUp(hipB, 3, hips);					//hips group A move up 100
-		usleep(80000);
+		//MoveUpHipsForReady(hipB, legB, 3);
 		// Move 2 step forward
 		MoveAxisUp(axisA, 3, axis);				//axis group B move backward 60
+		//LegMove(hipB, legB, 2, 3, t3, t4);
 	}
-	usleep(80000);
 	{// End walking
 		MoveDown(hipB, 3, hips);
+		//MoveUp(hipA, 3, hips);
+		//LegMove(hipA, legA, 2, 3, t3, t4);	//Push
+		//MoveDown(hipA, 3, hips);
 	}
-	usleep(100000);
-	printf("One Cycle Forward\n");
+	sleep(1);
+	printf("One Cycle\n");
 }
 
 

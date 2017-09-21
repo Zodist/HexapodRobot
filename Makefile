@@ -35,7 +35,7 @@ GYROOBJECTS = $(OBJECTS_DIR)/RTIMULibDrive.o \
 .SUFFIXES : .c .o
 
 $(TARGET) : $(OBJS)
-	$(CC) -o $@ $(OBJS) $(GYROOBJECTS) $(DIR_OBJECTS)/RoboPiLib.o -lstdc++
+	$(CC) -o $@ $(OBJS) $(GYROOBJECTS) $(DIR_OBJECTS)/RoboPiLib.o -lstdc++ -lpthread
 
 clean:
 	rm -f $(OBJS) $(GYROOBJECTS)

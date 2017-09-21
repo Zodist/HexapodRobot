@@ -21,29 +21,35 @@
 //  OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 //  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-
-#ifndef _RTIMULIB_H
-#define	_RTIMULIB_H
-
-#include "RTIMULibDefs.h"
-
-#include "RTMath.h"
-
-#include "RTFusion.h"
-#include "RTFusionKalman4.h"
-
-#include "RTIMUHal.h"
-#include "IMUDrivers/RTIMU.h"
-#include "IMUDrivers/RTIMUNull.h"
-#include "IMUDrivers/RTIMUMPU9150.h"
-#include "IMUDrivers/RTIMUGD20HM303D.h"
-#include "IMUDrivers/RTIMUGD20M303DLHC.h"
-#include "IMUDrivers/RTIMULSM9DS0.h"
-
-#include "IMUDrivers/RTHumidity.h"
-#include "IMUDrivers/RTHumidityHTS221.h"
+#ifndef _RTPRESSURE_H
+#define	_RTPRESSURE_H
 
 #include "RTIMUSettings.h"
+#include "RTIMULibDefs.h"
+#include "RTPressureDefs.h"
 
+class RTPressure
+{
+public:
+    //  Pressure sensor objects should always be created with the following call
 
-#endif // _RTIMULIB_H
+    static RTPressure *createPressure(RTIMUSettings *settings);
+
+    //  Constructor/destructor
+
+    RTPressure(RTIMUSettings *settings);
+    virtual ~RTPressure();
+
+    //  These functions must be provided by sub classes
+
+    virtual const char *pressureName() = 0;                 // the name of the pressure sensor
+    virtual int pressureType() = 0;                         // the type code of the pressure sensor
+    virtual bool pressureInit() = 0;                        // set up the pressure sensor
+    virtual bool pressureRead(RTIMU_DATA& data) = 0;        // get latest value
+
+protected:
+    RTIMUSettings *m_settings;                              // the settings object pointer
+
+};
+
+#endif // _RTPRESSURE_H
